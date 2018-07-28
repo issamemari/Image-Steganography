@@ -1,3 +1,4 @@
 fun main(args: Array<String>) {
-    println("Hello World!")
+    val image = readImage("/home/issa/Desktop/DSC_0909.JPG")
+    println(image[0][1])
 }
