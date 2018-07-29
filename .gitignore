@@ -7,3 +7,5 @@
 /captures
 target
 out
+src/main/python/cifar-10-batches-py
+src/main/python/cifar-10-python.tar.gz

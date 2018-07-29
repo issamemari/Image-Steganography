@@ -63,7 +63,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         val lsbPixel = result[0, 0]
 
         var lsb = numberOfBits - 1
-        for (bit in 0 until numberOfChannels){
+        for (bit in 0 until numberOfChannels) {
             lsbPixel[bit] = lsbPixel[bit] and 0xFE.toByte() or (lsb and 1).toByte()
             lsb = lsb shr 1
         }
@@ -83,7 +83,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
             for (j in 0 until result.height) {
                 //We don't want to write over the LSB pixel
-                if (i==0 && j==0) continue
+                if (i == 0 && j == 0) continue
                 if (hasFinished) break
 
                 // We extract the information stored in the ith,jth pixel in the original image
