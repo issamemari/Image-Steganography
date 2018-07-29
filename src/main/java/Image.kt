@@ -3,19 +3,31 @@ import java.io.File
 import java.io.FileNotFoundException
 import javax.imageio.ImageIO
 
-class Image(val imgPath: String) {
+
+/*
+    You can either instantiate an Image by providing a BufferedImage or by providing its path
+    NOTE:
+        AT LEAST one option should be used.
+        Using a BufferedImage takes precedence over providing a file path.
+ */
+
+class Image(val imgPath: String = "", imageBuffer:BufferedImage? = null) {
 
     val image: BufferedImage
     val height: Int
     val width: Int
 
     init {
-        val imageFile = File(imgPath)
+        image = if (imageBuffer!=null){
+            imageBuffer
+        }else {
+            val imageFile = File(imgPath)
 
-        if (!imageFile.exists()) throw FileNotFoundException("File $imgPath not found.")
-        if (imageFile.isDirectory) throw IllegalArgumentException("$imgPath is a directory, not an image.")
+            if (!imageFile.exists()) throw FileNotFoundException("File $imgPath not found.")
+            if (imageFile.isDirectory) throw IllegalArgumentException("$imgPath is a directory, not an image.")
 
-        image = ImageIO.read(imageFile)
+            ImageIO.read(imageFile)
+        }
 
         width = image.width
         height = image.height
@@ -39,6 +51,8 @@ class Image(val imgPath: String) {
         ImageIO.write(image, imageType, outputfile)
 
     }
+
+    fun copy() = Image(imageBuffer = image)
 
 }
 
