@@ -1,8 +1,10 @@
 import java.awt.Color
 import java.nio.ByteBuffer
 import java.math.BigInteger
+import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or
+import com.sun.xml.internal.bind.v2.model.core.ID
 
 
 class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
@@ -40,8 +42,8 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
             return (number shr (16 - (bitIndex + k))) and ((1 shl k) - 1)
         } else {
             val number = (message[byteIndex].toInt())
-            val shiftRight = maxOf((8 - (offset + k)), 0)
-            val shiftLeft = minOf(k, 8 - offset)
+            val shiftRight = maxOf((8 - (bitIndex + k)), 0)
+            val shiftLeft = minOf(k, 8 - bitIndex)
             return (number shr shiftRight) and ((1 shl shiftLeft) - 1)
         }
     }
@@ -63,7 +65,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         val lsbPixel = result[0, 0]
 
         var lsb = numberOfBits - 1
-        for (bit in 0 until numberOfChannels){
+        for (bit in 0 until numberOfChannels) {
             lsbPixel[bit] = lsbPixel[bit] and 0xFE.toByte() or (lsb and 1).toByte()
             lsb = lsb shr 1
         }
@@ -83,7 +85,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
             for (j in 0 until result.height) {
                 //We don't want to write over the LSB pixel
-                if (i==0 && j==0) continue
+                if (i == 0 && j == 0) continue
                 if (hasFinished) break
 
                 // We extract the information stored in the ith,jth pixel in the original image
@@ -92,6 +94,10 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
                 //For every channel in that pixel we store a chunk of the message
 
                 for (channel in 0 until numberOfChannels) {
+                    if (offset==45)
+                    {
+                        println()
+                    }
                     val chunk = getKBits(message, k, offset)
                     pixel[channel] = (pixel[channel] and (0xFF shl k).toByte() or chunk.toByte())
                     offset += k
@@ -133,7 +139,111 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     }
 
     override fun extract(coverImage: Image): ByteArray {
+        var lsb = getLSB(coverImage[0, 0])
+
+
+       // var res = readKByte(lsb, 0, 4, coverImage)
+
+
+       /* val size =ByteBuffer.wrap(res).int
+        println(size)*/
+
+        //res.forEach { print(it.toInt()) }
+
+        val message  = readKByte(lsb,0,4+2,coverImage)
+
+        message.forEach {
+            println(it)
+        }
+
+
+
         return ByteArray(5)
+    }
+
+    fun getLSB(pixel: Pixel): Int {
+        var result = 0
+
+        for (i in 0 until numberOfChannels) {
+            result = result + (pixel[i] and 1) * (Math.pow(2.0, i.toDouble())).toInt()
+        }
+
+        return result + 1
+    }
+
+
+    /*
+        This functions reads k bytes starting from offset and uses lsb
+     */
+    fun readKByte(lsb: Int, offset: Int, k: Int, image: Image): ByteArray {
+        var counter = 0
+        val numberOfBits = k * 8
+        var seekPointer = 0
+        var hasReachedOffset = false
+        var hasFinished = false
+
+        val byteBuffer = ByteBuffer.allocate(k)
+
+        var byte: Byte = 0
+
+
+        for (i in 0 until image.width) {
+            if (hasFinished) break
+
+            for (j in 0 until image.height) {
+                if (hasFinished) break
+                if (i == 0 && j == 0) continue
+                if (!hasReachedOffset) {
+                    if (seekPointer == offset) {
+                        hasReachedOffset = true
+                    }
+                }
+                for (channel in 0 until numberOfChannels) {
+                    if (hasFinished) break
+                    if (!hasReachedOffset) {
+                        if (seekPointer == offset) {
+                            hasReachedOffset = true
+                            continue
+                        } else {
+                            seekPointer += lsb
+                        }
+                    } else {
+                        val data = image[i, j][channel]
+
+                        for (bit in lsb - 1 downTo 0) {
+                            if (hasFinished) break
+
+
+                            byte=Byte_set(byte, counter++ % 8, data[bit])
+                            if (counter % 8 == 0 && counter > 0) {
+                                byteBuffer.put(byte)
+                                byte = 0
+                            }
+
+                            hasFinished = counter == numberOfBits
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+
+        return byteBuffer.array()
+    }
+
+
+    operator fun Byte.get(position: Int): Boolean {
+        return (this.toInt() shr position and 1) == 1
+    }
+
+    public fun Byte_set(byte: Byte, position: Int, value: Boolean): Byte {
+        if (value)
+            return (byte or ((1 shl (7 - position)).toByte()))
+        else
+            return byte and (1 shl (7 - position)).inv().toByte()
+
     }
 }
 
