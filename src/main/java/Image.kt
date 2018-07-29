@@ -11,16 +11,16 @@ import javax.imageio.ImageIO
         Using a BufferedImage takes precedence over providing a file path.
  */
 
-class Image(val imgPath: String = "", imageBuffer:BufferedImage? = null) {
+class Image(imgPath: String = "", imageBuffer: BufferedImage? = null) {
 
-    val image: BufferedImage
+    private val image: BufferedImage
     val height: Int
     val width: Int
 
     init {
-        image = if (imageBuffer!=null){
+        image = if (imageBuffer != null) {
             imageBuffer
-        }else {
+        } else {
             val imageFile = File(imgPath)
 
             if (!imageFile.exists()) throw FileNotFoundException("File $imgPath not found.")
@@ -35,12 +35,12 @@ class Image(val imgPath: String = "", imageBuffer:BufferedImage? = null) {
 
 
     operator fun get(i: Int, j: Int): Pixel {
-        require(i in 0..width && j in 0..height)
+        require(i in 0 until width && j in 0 until height)
         return Pixel(image.getRGB(i, j))
     }
 
     operator fun set(i: Int, j: Int, p: Pixel): Unit {
-        require(i in 0..width && j in 0..height)
+        require(i in 0 until width && j in 0 until height)
         image.setRGB(i, j, p.getColorCode())
     }
 
@@ -56,7 +56,7 @@ class Image(val imgPath: String = "", imageBuffer:BufferedImage? = null) {
 
 }
 
-class Pixel(colorCode: Int) {
+class Pixel(colorCode: Int, private val numberOfChannels: Int = 3) {
 
     private var alpha: Byte
     private var r: Byte;
@@ -103,6 +103,31 @@ class Pixel(colorCode: Int) {
             b = value
         }
 
+
+    operator fun set(index: Int, value: Byte) {
+        require(index in 0 until numberOfChannels)
+        require(value.isByte())
+
+        when (index) {
+            0 -> R = value
+            1 -> G = value
+            2 -> B = value
+            3 -> Alpha = value
+        }
+    }
+
+    operator fun get(index: Int): Byte {
+        require(index in 0 until numberOfChannels)
+
+        when (index) {
+            0 -> return R
+            1 -> return G
+            2 -> return B
+            3 -> return Alpha
+        }
+
+        throw IllegalArgumentException()
+    }
 
     fun Byte.isByte() = this in Byte.MIN_VALUE..Byte.MAX_VALUE
 
