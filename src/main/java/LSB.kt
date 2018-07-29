@@ -1,9 +1,11 @@
 import java.awt.Color
 import java.nio.ByteBuffer
 import java.math.BigInteger
+import kotlin.experimental.and
+import kotlin.experimental.or
 
 
-class LSB(numberOfBits: Int) : Steganographer {
+class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     val numberOfBits: Int
 
     init {
@@ -46,7 +48,49 @@ class LSB(numberOfBits: Int) : Steganographer {
 
     // Function that actually writes the message to the cover image
     private fun fill(message: ByteArray, coverImage: Image): Image {
-        return Image("")
+
+        // We avoid side effects (altering coverImage's content), by copying it first
+        val result = coverImage.copy()
+
+
+        // Number of bits is constant always
+        val k = numberOfBits
+
+        var offset = 0
+
+        //Flag used to check whether we finished encoding at any level of the 3 nested for-loops
+        var hasFinished = false
+
+        for (i in 0 until result.width) {
+            if (hasFinished) break
+
+            for (j in 0 until result.height) {
+                if (hasFinished) break
+
+                // We extract the information stored in the ith,jth pixel in the original image
+                val pixel = result[i, j]
+
+                //For every channel in that pixel we store a chunk of the message
+
+                for (channel in 0 until numberOfChannels) {
+                    val chunk = getKBits(message, k, offset)
+                    pixel[channel] = (pixel[channel] and (0xFF shl k).toByte() or chunk.toByte())
+                    offset += k
+
+                    //Check if we finished encoding
+                    if (offset >= message.size * 8) {
+                        hasFinished = true
+                        break
+                    }
+                }
+
+                //Write back the pixel loaded with the message
+                result[i, j] = pixel
+            }
+        }
+
+
+        return result
     }
 
     override fun embed(message: ByteArray, coverImage: Image): Image {
