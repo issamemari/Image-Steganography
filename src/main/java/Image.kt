@@ -90,7 +90,7 @@ class Pixel(colorCode: Int) {
         }
 
 
-    fun Byte.isByte()= this in Byte.MIN_VALUE..Byte.MAX_VALUE
+    fun Byte.isByte() = this in Byte.MIN_VALUE..Byte.MAX_VALUE
 
     fun getColorCode(): Int {
         val hex = String.format("%02x%02x%02x%02x", alpha, r, g, b)

@@ -3,8 +3,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 
-fun readImage(imagePath: String) : Array<Array<Color>>
-{
+fun readImage(imagePath: String): Array<Array<Color>> {
     val imageFile = File(imagePath)
 
     if (!imageFile.exists()) throw RuntimeException("File $imagePath not found.")
@@ -17,12 +16,12 @@ fun readImage(imagePath: String) : Array<Array<Color>>
 
     val colors2d = Array<Array<Color>>(height) {
         Array<Color>(width) {
-            Color(0,0, 0)
+            Color(0, 0, 0)
         }
     }
 
-    for (i in 0 .. height - 1)
-        for (j in 0 .. width - 1)
+    for (i in 0..height - 1)
+        for (j in 0..width - 1)
             colors2d[i][j] = Color(image.getRGB(j, i))
 
     return colors2d
