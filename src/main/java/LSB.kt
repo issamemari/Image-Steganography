@@ -1,12 +1,6 @@
-import java.awt.Color
 import java.nio.ByteBuffer
-import java.math.BigInteger
-import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or
-
-//import com.sun.xml.internal.bind.v2.model.core.ID
-
 
 class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     val numberOfBits: Int
@@ -16,22 +10,6 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     }
 
     // Function takes as input a byte array, returns k bits in the array starting from a given offset in bits
-    // Must satisfy the following tests:
-    //    TEST 1:
-    //    val k = 5
-    //    var offset = 36
-    //
-    //    val message: ByteArray = byteArrayOf(0b00001100, 0b00010101, 0b00100011, 0b00101100, 0b00111011)
-    //    println(getKBits(message, k, offset))
-    //    outputs 11
-    //
-    //    TEST 2:
-    //    val k = 5
-    //    var offset = 22
-    //
-    //    val message: ByteArray = byteArrayOf(0b00001100, 0b00010101, 0b00100011, 0b00101100, 0b00111011)
-    //    println(getKBits(message, k, offset))
-    //    outputs 25
     private fun getKBits(message: ByteArray, k: Int, offset: Int): Int {
         require(k in 0..8 && offset in 0..message.size * 8)
 
@@ -121,12 +99,10 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     override fun embed(message: ByteArray, coverImage: Image): Image {
         // Check that message fits into image
         val numberOfBytesInImage = coverImage.width * coverImage.height * 3
+        val numberOfUsableBitsInImage = numberOfBytesInImage * this.numberOfBits
 
-        //the 3 + part is for storing the number of LSB's used in the first pixel (3 channels = 3 bytes) encoding the message
-        // TODO: The 3 + part is wrong, it should be added to the size of the message instead
-        val numberOfUsableBytesInImage = 3 + numberOfBytesInImage * this.numberOfBits / 8
-
-        if (numberOfUsableBytesInImage < message.size) throw RuntimeException("Message is too big to fit in the cover image")
+        if (numberOfUsableBitsInImage < message.size * 8 + 3)
+            throw RuntimeException("Message is too big to fit in the cover image")
 
         // Convert message size to a 4-byte array
         val buffer = ByteBuffer.allocate(4)
@@ -143,7 +119,6 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         var lsb = getLSB(coverImage[0, 0])
 
         val messageSize = ByteBuffer.wrap(readKByte(lsb, 0, 4, coverImage)).int
-
         val message = readKByte(lsb, 4 * 8, messageSize, coverImage)
 
         return message
