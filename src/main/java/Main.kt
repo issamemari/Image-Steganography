@@ -36,6 +36,9 @@ class Extract: CliktCommand(help="Extract a file or a string from an image") {
     }
 }
 
-fun main(args: Array<String>) = Steganography()
-        .subcommands(Embed(), Extract())
-        .main(args)
+object Main {
+    @JvmStatic
+    fun main(args: Array<String>) = Steganography()
+            .subcommands(Embed(), Extract())
+            .main(args)
+}
