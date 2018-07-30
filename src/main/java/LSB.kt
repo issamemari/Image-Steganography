@@ -4,6 +4,7 @@ import java.math.BigInteger
 import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or
+
 //import com.sun.xml.internal.bind.v2.model.core.ID
 
 
@@ -97,10 +98,6 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
                 //For every channel in that pixel we store a chunk of the message
                 for (channel in 0 until numberOfChannels) {
-                    if (offset==45)
-                    {
-                        println()
-                    }
                     val chunk = getKBits(message, k, offset)
                     pixel[channel] = (pixel[channel] and (0xFF shl k).toByte() or chunk.toByte())
                     offset += k
@@ -146,7 +143,8 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         var lsb = getLSB(coverImage[0, 0])
 
         val messageSize = ByteBuffer.wrap(readKByte(lsb, 0, 4, coverImage)).int
-        val message  = readKByte(lsb,0, messageSize + 4, coverImage)
+
+        val message = readKByte(lsb, 4 * 8, messageSize, coverImage)
 
         return message
     }
@@ -164,6 +162,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
     /*
         This functions reads k bytes starting from offset and uses lsb
+        offset is in BITS
      */
     fun readKByte(lsb: Int, offset: Int, k: Int, image: Image): ByteArray {
         var counter = 0
@@ -190,21 +189,20 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
                 }
                 for (channel in 0 until numberOfChannels) {
                     if (hasFinished) break
-                    if (!hasReachedOffset) {
-                        if (seekPointer == offset) {
-                            hasReachedOffset = true
-                            continue
-                        } else {
-                            seekPointer += lsb
-                        }
-                    } else {
-                        val data = image[i, j][channel]
 
-                        for (bit in lsb - 1 downTo 0) {
-                            if (hasFinished) break
+                    val data = image[i, j][channel]
+
+                    for (bit in lsb - 1 downTo 0) {
+                        if (hasFinished) break
 
 
-                            byte=Byte_set(byte, counter++ % 8, data[bit])
+                        if (!hasReachedOffset){
+                            seekPointer++
+                            if (seekPointer == offset){
+                                hasReachedOffset=true
+                            }
+                        }else {
+                            byte = Byte_set(byte, counter++ % 8, data[bit])
                             if (counter % 8 == 0 && counter > 0) {
                                 byteBuffer.put(byte)
                                 byte = 0
