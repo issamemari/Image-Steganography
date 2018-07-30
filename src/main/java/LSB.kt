@@ -4,7 +4,7 @@ import java.math.BigInteger
 import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or
-import com.sun.xml.internal.bind.v2.model.core.ID
+//import com.sun.xml.internal.bind.v2.model.core.ID
 
 
 class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
@@ -43,8 +43,11 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         } else {
             val number = (message[byteIndex].toInt())
             val shiftRight = maxOf((8 - (bitIndex + k)), 0)
-            val shiftLeft = minOf(k, 8 - bitIndex)
-            return (number shr shiftRight) and ((1 shl shiftLeft) - 1)
+            val shiftLeft = minOf(8 - bitIndex, k)
+            var res = (number shr shiftRight) and ((1 shl shiftLeft) - 1)
+            if ((8 - bitIndex) < k)
+                return res shl (k - (8 - bitIndex))
+            return res
         }
     }
 
@@ -59,21 +62,22 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
             We have to store how many LSB's our encoding is using, to do so
             We use the first pixel to store the information
             The valid values for LSB is [1..8]
-            So to be able to store the number in binary in the first LSB we save values in [1..7]
+            So to be able to store the number in binary in the first LSB we save values in [0..7]
 
          */
         val lsbPixel = result[0, 0]
 
         var lsb = numberOfBits - 1
-        for (bit in 0 until numberOfChannels) {
-            lsbPixel[bit] = lsbPixel[bit] and 0xFE.toByte() or (lsb and 1).toByte()
+
+        // It was for (channel in 0 until numberOfChannels), but I think it shouldn't be
+        for (channel in 0 until 3) {
+            lsbPixel[channel] = lsbPixel[channel] and 0xFE.toByte() or (lsb and 1).toByte()
             lsb = lsb shr 1
         }
         result[0, 0] = lsbPixel
 
         // Number of bits is constant always
         val k = numberOfBits
-
         var offset = 0
 
         //Flag used to check whether we finished encoding at any level of the 3 nested for-loops
@@ -92,7 +96,6 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
                 val pixel = result[i, j]
 
                 //For every channel in that pixel we store a chunk of the message
-
                 for (channel in 0 until numberOfChannels) {
                     if (offset==45)
                     {
@@ -123,6 +126,7 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
         val numberOfBytesInImage = coverImage.width * coverImage.height * 3
 
         //the 3 + part is for storing the number of LSB's used in the first pixel (3 channels = 3 bytes) encoding the message
+        // TODO: The 3 + part is wrong, it should be added to the size of the message instead
         val numberOfUsableBytesInImage = 3 + numberOfBytesInImage * this.numberOfBits / 8
 
         if (numberOfUsableBytesInImage < message.size) throw RuntimeException("Message is too big to fit in the cover image")
@@ -141,24 +145,10 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
     override fun extract(coverImage: Image): ByteArray {
         var lsb = getLSB(coverImage[0, 0])
 
+        val messageSize = ByteBuffer.wrap(readKByte(lsb, 0, 4, coverImage)).int
+        val message  = readKByte(lsb,0, messageSize + 4, coverImage)
 
-       // var res = readKByte(lsb, 0, 4, coverImage)
-
-
-       /* val size =ByteBuffer.wrap(res).int
-        println(size)*/
-
-        //res.forEach { print(it.toInt()) }
-
-        val message  = readKByte(lsb,0,4+2,coverImage)
-
-        message.forEach {
-            println(it)
-        }
-
-
-
-        return ByteArray(5)
+        return message
     }
 
     fun getLSB(pixel: Pixel): Int {
@@ -228,7 +218,6 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
             }
         }
-
 
         return byteBuffer.array()
     }
