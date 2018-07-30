@@ -17,8 +17,12 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         val bitIndex = offset % 8
 
         if (byteIndex < message.size - 1) {
-            val number = (message[byteIndex].toInt().shl(8)) or message[byteIndex + 1].toInt()
-            return (number shr (16 - (bitIndex + k))) and ((1 shl k) - 1)
+            val number = (message[byteIndex].toInt().shl(8)) or (message[byteIndex + 1].toInt() and 255)
+
+            val thing1 = number shr (16 - (bitIndex + k))
+            val thing2 = (1 shl k) - 1
+            return (thing1) and (thing2)
+
         } else {
             val number = (message[byteIndex].toInt())
             val shiftRight = maxOf((8 - (bitIndex + k)), 0)
@@ -109,6 +113,10 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         buffer.putInt(message.size)
         val sizeByteArray = buffer.array()
 
+
+        // FOR DEBUGGING ONLY
+        val retrievedMessageSize = ByteBuffer.wrap(sizeByteArray).int
+
         // Append message size byte array to the message
         val newMessage = sizeByteArray + message
 
@@ -171,12 +179,12 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
                         if (hasFinished) break
 
 
-                        if (!hasReachedOffset){
+                        if (!hasReachedOffset) {
                             seekPointer++
-                            if (seekPointer == offset){
-                                hasReachedOffset=true
+                            if (seekPointer == offset) {
+                                hasReachedOffset = true
                             }
-                        }else {
+                        } else {
                             byte = Byte_set(byte, counter++ % 8, data[bit])
                             if (counter % 8 == 0 && counter > 0) {
                                 byteBuffer.put(byte)
