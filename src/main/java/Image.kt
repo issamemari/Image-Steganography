@@ -44,7 +44,8 @@ class Image(imgPath: String = "", imageBuffer: BufferedImage? = null) {
         image.setRGB(i, j, p.getColorCode())
     }
 
-    fun exportImage(imagePath: String = "image", imageType: String = "jpg") {
+    // TODO: Fix adding .png to the extension if there is already an extension in the imagePath
+    fun export(imagePath: String = "image", imageType: String = "png") {
 
 
         val outputfile = File("$imagePath.$imageType")

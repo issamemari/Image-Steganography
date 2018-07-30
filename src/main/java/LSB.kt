@@ -2,7 +2,7 @@ import java.nio.ByteBuffer
 import kotlin.experimental.and
 import kotlin.experimental.or
 
-class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
+class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer {
     val numberOfBits: Int
 
     init {
@@ -208,4 +208,3 @@ class LSB(numberOfBits: Int, val numberOfChannels: Int = 3) : Steganographer {
 
     }
 }
-
