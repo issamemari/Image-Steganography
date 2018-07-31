@@ -2,7 +2,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.FileNotFoundException
 import javax.imageio.ImageIO
-
+import org.apache.commons.io.FilenameUtils
 
 /*
     You can either instantiate an Image by providing a BufferedImage or by providing its path
@@ -44,13 +44,11 @@ class Image(imgPath: String = "", imageBuffer: BufferedImage? = null) {
         image.setRGB(i, j, p.getColorCode())
     }
 
-    // TODO: Fix adding .png to the extension if there is already an extension in the imagePath
-    fun export(imagePath: String = "image", imageType: String = "png") {
-
-
-        val outputfile = File("$imagePath.$imageType")
+    fun export(imagePath: String = "image") {
+        val imageType = FilenameUtils.getExtension(imagePath)
+        require(imageType in listOf("tiff", "bmp", "gif", "wbmp", "png"))
+        val outputfile = File("$imagePath")
         ImageIO.write(image, imageType, outputfile)
-
     }
 
     fun copy() = Image(imageBuffer = image)

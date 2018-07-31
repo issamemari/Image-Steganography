@@ -113,10 +113,6 @@ class LSB(numberOfBits: Int = 1, val numberOfChannels: Int = 3) : Steganographer
         buffer.putInt(message.size)
         val sizeByteArray = buffer.array()
 
-
-        // FOR DEBUGGING ONLY
-        val retrievedMessageSize = ByteBuffer.wrap(sizeByteArray).int
-
         // Append message size byte array to the message
         val newMessage = sizeByteArray + message
 
