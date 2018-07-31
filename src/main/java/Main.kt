@@ -15,7 +15,7 @@ class Embed : CliktCommand(help = "Embed a file or a string in an image") {
     val numberOfBits: Int by option(help = "Number of least-significatn bits to use for encoding the message").int().default(1)
     val message: String by argument(help = "Message to encode")
     val inputImagePath: String by argument(help = "Path to the input image")
-    val outputImagePath: String by argument(help = "Path to the output image")
+    val outputImagePath: String by argument(help = "Path to the output image. Output image format must be tiff, bmp, gif, wbmp, or png.")
 
     override fun run() {
         val steganographer = LSB(numberOfBits, 3)
