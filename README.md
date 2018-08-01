@@ -19,7 +19,8 @@ Options:
 Arguments:
   INPUTIMAGEPATH   Path to the input image
   OUTPUTIMAGEPATH  Path to the output image. Output image format must be tiff,
-                   bmp, gif, wbmp, or png```
+                   bmp, gif, wbmp, or png
+```
 
 ```
 Usage: extract [OPTIONS] INPUTIMAGEPATH
