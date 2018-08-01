@@ -4,7 +4,7 @@ class TrueByte(val value: Byte) {
     infix fun and(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() and trueByte.value.toInt()).toByte())
     }
-    
+
     infix fun or(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() or trueByte.value.toInt()).toByte())
     }
@@ -61,19 +61,22 @@ class TrueByte(val value: Byte) {
 
     operator fun get(position: Int): Boolean {
         require(position in 0..7)
-        return (this shr position) and TrueByte(1) == TrueByte(1)
+        return (this shr (7 - position)) and TrueByte(1) == TrueByte(1)
     }
 
     /*
         Use this to extract the bits within a given range
-        val   b = 0b00011100
-        b[2..4] = 0b00000111
+        val   b = 0b10011100
+        val b >> 3 = 00010011
+        u = 00000111
+        b[2..4] = 0b00000011
+
      */
     operator fun get(range: IntRange): TrueByte {
         require((range.first in 0..7) and (range.endInclusive in 0..7))
 
-        val t = (this shr range.first )
-        val u = TrueByte(0xFF.toByte()) shr (8-(range.count()))
+        val t = (this shr (7 - range.endInclusive))
+        val u = TrueByte(0b11111111.toByte()) shr (8 - range.count())
         return t and u
     }
 
