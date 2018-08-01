@@ -134,7 +134,7 @@ class TrueByteTest {
         b = TrueByte(0b00000000.toByte())
         assert(b.toString() == "0")
     }
-    
+
     @Test
     fun equalsing() {
 
@@ -145,4 +145,36 @@ class TrueByteTest {
         assert(!b.equals(85.0))
         assert(!b.equals(85.toLong()))
     }
+
+    @Test
+    fun binarizing() {
+        var b = TrueByte(0b01010101.toByte())
+        assert(b.binary() == "01010101")
+
+        b = TrueByte(0b00000000.toByte())
+        assert(b.binary() == "00000000")
+
+        b = TrueByte(0b11111111.toByte())
+        assert(b.binary() == "11111111")
+    }
+
+    /*
+    operator fun get(position: Int): Boolean {
+        require(position in 0..7)
+        return (this shr position) and TrueByte(1) == TrueByte(1)
+    }
+     */
+/*    @Test
+    fun indexing() {
+        var b = TrueByte(0b01010101.toByte())
+        assert(b[0] == false)
+        assert(b[1] == true)
+        assert(b[2] == false)
+        assert(b[3] == true)
+        assert(b[4] == false)
+        assert(b[5] == true)
+        assert(b[6] == false)
+        assert(b[7] == true)
+
+    }*/
 }
