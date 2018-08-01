@@ -20,9 +20,9 @@ class TrueByte(val value: Byte) {
 
 
     infix fun shr(bitCount: Int): TrueByte {
-        if (bitCount < 0) return shr(-bitCount)
-        val res = value.toInt() shr bitCount
-        return TrueByte(and255(res).toByte())
+        if (bitCount < 0) return shl(-bitCount)
+        val res = and255(value.toInt()) shr bitCount
+        return TrueByte(res.toByte())
     }
 
     infix fun shl(bitCount: Int): TrueByte {
