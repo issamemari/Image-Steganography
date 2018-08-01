@@ -1,20 +1,20 @@
 class TrueByte(val value: Byte) {
 
 
-    infix fun and(trueByte: TrueByte):TrueByte{
+    infix fun and(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() and trueByte.value.toInt()).toByte())
     }
 
 
-    infix fun or(trueByte: TrueByte):TrueByte{
+    infix fun or(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() or trueByte.value.toInt()).toByte())
     }
 
-    infix fun xor(trueByte: TrueByte):TrueByte{
+    infix fun xor(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() xor trueByte.value.toInt()).toByte())
     }
 
-    fun inv():TrueByte{
+    fun inv(): TrueByte {
         return TrueByte(and255(this.value.toInt().inv()).toByte())
     }
 
@@ -35,9 +35,18 @@ class TrueByte(val value: Byte) {
         return int and 255
     }
 
+    public fun binary(): String {
+        var sb = StringBuilder()
 
-    override operator fun equals(other:Any?):Boolean{
-        return when (other){
+        (0..7).forEach {
+            sb = sb.append(if (this[it]) "1" else "0")
+        }
+
+        return sb.toString()
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        return when (other) {
             null -> false
             is TrueByte -> this.value.equals(other.value)
             is Byte -> this.value.equals(other)
@@ -47,7 +56,7 @@ class TrueByte(val value: Byte) {
     }
 
 
-    override fun toString(): String{
+    override fun toString(): String {
         return and255(value.toInt()).toString()
     }
 
