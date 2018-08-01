@@ -19,11 +19,11 @@ class Steganography : CliktCommand() {
 
 class Embed : CliktCommand(help = "Embed a file or a string in an image") {
 
-    val numberOfBits: Int by option(help = "Number of least-significatn bits to use for encoding the message").int().default(1)
-    val messageFilePath: String by option(help = "Path to the file to hide in the image").default("")
-    val message: String by option(help = "Message to encode").default("")
-    val inputImagePath: String by argument(help = "Path to the input image")
-    val outputImagePath: String by argument(help = "Path to the output image. Output image format must be tiff, bmp, gif, wbmp, or png")
+    val numberOfBits: Int by option(help = "Number of least-significatn bits to use for encoding the message. Must be between 1 and 8.").int().default(1)
+    val messageFilePath: String by option(help = "Path to the file to hide in the image.").default("")
+    val message: String by option(help = "Message to encode.").default("")
+    val inputImagePath: String by argument(help = "Path to the input image.")
+    val outputImagePath: String by argument(help = "Path to the output image. Output image format must be tiff, bmp, gif, wbmp, or png.")
 
     override fun run() {
         val steganographer = LSB(numberOfBits, 3)
@@ -44,14 +44,14 @@ class Embed : CliktCommand(help = "Embed a file or a string in an image") {
             coverImage = steganographer.embed(sizeByteArray + fileNameBytes + fileBytes, Image(inputImagePath))
         }
         coverImage.export(outputImagePath)
-        TermUi.echo("Cover image saved to " + outputImagePath)
+        TermUi.echo("Cover image saved to " + outputImagePath + ".")
     }
 }
 
-class Extract : CliktCommand(help = "Extract a file or a string from an image") {
+class Extract : CliktCommand(help = "Extract a file or a string from an image.") {
 
-    val outputDirectoryPath: String by option(help = "Path to the directory where the hidden file will be output").default("")
-    val inputImagePath: String by argument(help = "Path to the input image")
+    val outputDirectoryPath: String by option(help = "Path to the directory where the hidden file will be output.").default("")
+    val inputImagePath: String by argument(help = "Path to the input image.")
 
     override fun run() {
         if (outputDirectoryPath == "") {
@@ -70,7 +70,7 @@ class Extract : CliktCommand(help = "Extract a file or a string from an image") 
             val currentPath = Paths.get(outputDirectoryPath)
             val filePath = Paths.get(currentPath.toString(), fileName).toString()
             FileUtils.writeByteArrayToFile(File(filePath), fileBytes)
-            TermUi.echo("Output file saved to " + filePath)
+            TermUi.echo("Output file saved to " + filePath + ".")
         }
     }
 }

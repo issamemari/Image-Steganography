@@ -5,33 +5,34 @@ This is a simple tool for image steganography written in Kotlin. The tool allows
 We provide a command-line interface for the tool as a jar file (steg.jar). The tool can be executed with two subcommands: `embed` and `extract`.
 
 ```
-Usage: embed [OPTIONS] INPUTIMAGEPATH OUTPUTIMAGEPATH
+Usage: java -jar steg.jar embed [OPTIONS] INPUTIMAGEPATH OUTPUTIMAGEPATH
 
   Embed a file or a string in an image
 
 Options:
   --number-of-bits INT      Number of least-significatn bits to use for
-                            encoding the message
-  --message-file-path TEXT  Path to the file to hide in the image
-  --message TEXT            Message to encode
+                            encoding the message. Must be between 1 and 8.
+  --message-file-path TEXT  Path to the file to hide in the image.
+  --message TEXT            Message to encode.
   -h, --help                Show this message and exit
 
 Arguments:
-  INPUTIMAGEPATH   Path to the input image
+  INPUTIMAGEPATH   Path to the input image.
   OUTPUTIMAGEPATH  Path to the output image. Output image format must be tiff,
-                   bmp, gif, wbmp, or png
+                   bmp, gif, wbmp, or png.
 ```
 
 ```
-Usage: extract [OPTIONS] INPUTIMAGEPATH
+Usage: java -jar steg.jar extract [OPTIONS] INPUTIMAGEPATH
 
-  Extract a file or a string from an image
+  Extract a file or a string from an image.
 
-Options:`
+Options:
   --output-directory-path TEXT  Path to the directory where the hidden file
-                                will be output
+                                will be output.
   -h, --help                    Show this message and exit
 
 Arguments:
-  INPUTIMAGEPATH  Path to the input image
+  INPUTIMAGEPATH  Path to the input image.
+
 ```
