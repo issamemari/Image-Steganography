@@ -4,8 +4,7 @@ class TrueByte(val value: Byte) {
     infix fun and(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() and trueByte.value.toInt()).toByte())
     }
-
-
+    
     infix fun or(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() or trueByte.value.toInt()).toByte())
     }
@@ -38,7 +37,7 @@ class TrueByte(val value: Byte) {
     public fun binary(): String {
         var sb = StringBuilder()
 
-        (0..7).forEach {
+        (7 downTo 0).forEach {
             sb = sb.append(if (this[it]) "1" else "0")
         }
 
@@ -65,8 +64,22 @@ class TrueByte(val value: Byte) {
         return (this shr position) and TrueByte(1) == TrueByte(1)
     }
 
+    /*
+        Use this to extract the bits within a given range
+        val   b = 0b00011100
+        b[2..4] = 0b00000111
+     */
+    operator fun get(range: IntRange): TrueByte {
+        require((range.first in 0..7) and (range.endInclusive in 0..7))
+
+        val t = (this shr range.first )
+        val u = TrueByte(0xFF.toByte()) shr (8-(range.count()))
+        return t and u
+    }
+
     override fun hashCode(): Int {
         return value.hashCode()
     }
+
 
 }
