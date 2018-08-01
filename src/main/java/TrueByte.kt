@@ -1,20 +1,19 @@
 class TrueByte(val value: Byte) {
 
 
-    infix fun and(trueByte: TrueByte):TrueByte{
+    infix fun and(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() and trueByte.value.toInt()).toByte())
     }
-
-
-    infix fun or(trueByte: TrueByte):TrueByte{
+    
+    infix fun or(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() or trueByte.value.toInt()).toByte())
     }
 
-    infix fun xor(trueByte: TrueByte):TrueByte{
+    infix fun xor(trueByte: TrueByte): TrueByte {
         return TrueByte(and255(this.value.toInt() xor trueByte.value.toInt()).toByte())
     }
 
-    fun inv():TrueByte{
+    fun inv(): TrueByte {
         return TrueByte(and255(this.value.toInt().inv()).toByte())
     }
 
@@ -35,9 +34,18 @@ class TrueByte(val value: Byte) {
         return int and 255
     }
 
+    public fun binary(): String {
+        var sb = StringBuilder()
 
-    override operator fun equals(other:Any?):Boolean{
-        return when (other){
+        (7 downTo 0).forEach {
+            sb = sb.append(if (this[it]) "1" else "0")
+        }
+
+        return sb.toString()
+    }
+
+    override operator fun equals(other: Any?): Boolean {
+        return when (other) {
             null -> false
             is TrueByte -> this.value.equals(other.value)
             is Byte -> this.value.equals(other)
@@ -47,7 +55,7 @@ class TrueByte(val value: Byte) {
     }
 
 
-    override fun toString(): String{
+    override fun toString(): String {
         return and255(value.toInt()).toString()
     }
 
@@ -56,8 +64,22 @@ class TrueByte(val value: Byte) {
         return (this shr position) and TrueByte(1) == TrueByte(1)
     }
 
+    /*
+        Use this to extract the bits within a given range
+        val   b = 0b00011100
+        b[2..4] = 0b00000111
+     */
+    operator fun get(range: IntRange): TrueByte {
+        require((range.first in 0..7) and (range.endInclusive in 0..7))
+
+        val t = (this shr range.first )
+        val u = TrueByte(0xFF.toByte()) shr (8-(range.count()))
+        return t and u
+    }
+
     override fun hashCode(): Int {
         return value.hashCode()
     }
+
 
 }
