@@ -37,7 +37,7 @@ class TrueByte(val value: Byte) {
     public fun binary(): String {
         var sb = StringBuilder()
 
-        (7 downTo 0).forEach {
+        (0..7).forEach {
             sb = sb.append(if (this[it]) "1" else "0")
         }
 
