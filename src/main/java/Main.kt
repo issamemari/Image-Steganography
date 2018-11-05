@@ -25,7 +25,17 @@ class Embed : CliktCommand(help = "Embed a file or a string in an image") {
     val inputImagePath: String by argument(help = "Path to the input image.")
     val outputImagePath: String by argument(help = "Path to the output image. Output image format must be tiff, bmp, gif, wbmp, or png.")
 
+    val AllowedOutputFormats = arrayOf<String>("tiff", "bmp", "gif", "wbmp", "png")
+
+    fun String.getExtension() = this.substringAfterLast('.', "")
+
     override fun run() {
+
+        if (!AllowedOutputFormats.contains(outputImagePath.getExtension())) {
+            TermUi.echo("${outputImagePath.getExtension()} is an unsupported output format.\nSee help for embed command.")
+            return
+        }
+
         val steganographer = LSB(numberOfBits, 3)
         var coverImage: Image = Image(inputImagePath).copy()
         if (message != "") {
